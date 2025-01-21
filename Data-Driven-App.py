@@ -13,22 +13,19 @@ IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
 
 class StartPage:
-    def __init__(self, root, on_start):
+    def __init__(self, root, on_start, on_instructions):
         self.root = root
         self.on_start = on_start
+        self.on_instructions = on_instructions
         self.create_widgets()
 
     def create_widgets(self):
-        # Load the background image
-        self.bg_image = tk.PhotoImage(file="C://Users//USER//Desktop//image//movie.png")  # Replace with your image file name
-
-        # Create a Label for the background
+        self.bg_image = tk.PhotoImage(file="C://Users//USER//Desktop//image//movie.png")
         self.bg_label = tk.Label(self.root, image=self.bg_image)
-        self.bg_label.place(relwidth=1, relheight=1)  # Stretch to cover the entire window
+        self.bg_label.place(relwidth=1, relheight=1)
 
-        # Title Frame
         title_frame = tk.Frame(self.root, bg="#101314", bd=0)
-        title_frame.place(relx=0.5, rely=0.4, anchor="center")  # Positioning the title in the center
+        title_frame.place(relx=0.5, rely=0.4, anchor="center")
 
         title_my_label = tk.Label(
             title_frame,
@@ -48,9 +45,11 @@ class StartPage:
         )
         title_prime_label.pack(side=tk.LEFT)
 
-        # Start Button
+        button_frame = tk.Frame(self.root, bg="#000000")
+        button_frame.place(relx=0.5, rely=0.6, anchor="center")
+
         start_button = tk.Button(
-            self.root,
+            button_frame,
             text="Start",
             command=self.start_app,
             font=("Century Gothic", 20, "bold"),
@@ -60,9 +59,21 @@ class StartPage:
             width=10,
             height=1
         )
-        start_button.place(relx=0.5, rely=0.6, anchor="center")  # Position below the title
+        start_button.pack(side=tk.LEFT, padx=10)
 
-        # Footer Label
+        instructions_button = tk.Button(
+            button_frame,
+            text="Instructions",
+            command=self.on_instructions,
+            font=("Century Gothic", 20, "bold"),
+            bg="#446a96",
+            fg="#fffffa",
+            relief=tk.FLAT,
+            width=12,
+            height=1
+        )
+        instructions_button.pack(side=tk.LEFT, padx=10)
+
         footer_label = tk.Label(
             self.root,
             text="Created by: Taha Khan",
@@ -70,20 +81,76 @@ class StartPage:
             bg="#000000",
             fg="#36454f"
         )
-        footer_label.place(relx=0.5, rely=0.95, anchor="center")  # Positioned near the bottom
+        footer_label.place(relx=0.5, rely=0.95, anchor="center")
 
     def start_app(self):
-        self.bg_label.destroy()  # Remove the background image
+        self.bg_label.destroy()
         self.on_start()
+
+
+class InstructionsPage:
+    def __init__(self, root, on_back):
+        self.root = root
+        self.on_back = on_back
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.frame = tk.Frame(self.root, bg="#000000")
+        self.frame.place(relwidth=1, relheight=1)
+
+        title_label = tk.Label(
+            self.frame,
+            text="How to Use MyPrime",
+            font=("Impact", 30, "bold"),
+            bg="#000000",
+            fg="#fffffa"
+        )
+        title_label.pack(pady=20)
+
+        instructions_text = (
+            "1. Click 'Start' to browse movies.\n"
+            "2. Use the navigation bar to view 'Popular', 'Now Playing', and 'Top Rated' movies.\n"
+            "3. Enter a movie name in the search bar and click the search button to find specific movies.\n"
+            "4. Click the left or right arrows to navigate between movies.\n"
+            "5. Enjoy exploring and discovering new movies!"
+        )
+
+        instructions_label = tk.Label(
+            self.frame,
+            text=instructions_text,
+            font=("Century Gothic", 14),
+            bg="#000000",
+            fg="#fffffa",
+            justify=tk.LEFT
+        )
+        instructions_label.pack(pady=10, padx=20, anchor="w")
+
+        back_button = tk.Button(
+            self.frame,
+            text="Back",
+            command=self.back,
+            font=("Century Gothic", 16, "bold"),
+            bg="#446a96",
+            fg="#fffffa",
+            relief=tk.FLAT,
+            width=10,
+            height=1
+        )
+        back_button.pack(pady=20)
+
+    def back(self):
+        self.frame.destroy()
+        self.on_back()
 
 
 class MovieApp:
     def __init__(self, root):
         self.root = root
         self.root.title("MyPrime")
-        self.root.geometry("1100x700")  # Adjusted window size
+        self.root.geometry("1100x700")
         self.root.configure(bg="#000000")
         self.root.resizable(False, False)
+        self.show_start_page()
 
         # Center the window
         self.root.eval('tk::PlaceWindow . center')
@@ -100,7 +167,23 @@ class MovieApp:
         self.current_page = 1
         self.total_pages = 1
 
+    def show_start_page(self):
+        self.clear_widgets()
+        StartPage(self.root, self.create_widgets, self.show_instructions_page)
+
+    def show_instructions_page(self):
+        self.clear_widgets()
+        InstructionsPage(self.root, self.show_start_page)
+    
+    def clear_widgets(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
     def create_widgets(self):
+        self.clear_widgets()
+        # Movie browsing UI implementation goes here (not shown for brevity)
+        pass
+
         # Title Label
         title_frame = tk.Frame(self.root, bg="#000000")
         title_frame.pack(pady=10, anchor="w", padx=20)
@@ -351,7 +434,9 @@ class MovieApp:
             messagebox.showinfo("Start of Results", "You are already at the first result.")
 
     def run(self):
-        StartPage(self.root, self.create_widgets)
+        self.show_start_page()
+
+
 
 
 # Run the app
@@ -360,3 +445,4 @@ if __name__ == "__main__":
     app = MovieApp(root)
     app.run()
     root.mainloop()
+
