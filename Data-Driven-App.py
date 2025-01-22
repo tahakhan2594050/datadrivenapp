@@ -344,7 +344,7 @@ class MovieApp:
         self.next_button.pack(side=tk.LEFT, padx=5, ipadx=10, ipady=5)
 
     def fetch_movies(self, category):
-        """Fetch movies based on category (Popular, Now Playing, Top Rated)"""
+        
         params = {
             "api_key": API_KEY,
             "language": "en-US",
